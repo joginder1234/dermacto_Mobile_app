@@ -10,6 +10,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import colors from "../../config/colors";
@@ -17,10 +18,12 @@ import { DataContext } from "../../context/AppDataContext";
 import CustomeAppbar from "../re_usable/Appbar";
 import { useRef } from "react";
 import CountryPicker from "react-native-country-picker-modal";
+import * as ImagePicker from "expo-image-picker";
 import { useEffect } from "react";
 import {
   getmyDetailsfunction,
   updateUserProfileFunction,
+  uploadFileFunction,
 } from "../../backend/data_handler";
 import CustomeLoaderState from "../custom_classes/custome_loader";
 
@@ -68,13 +71,15 @@ function MyProfile({ navigation }) {
   let myProfile = dataContext.userProfile;
 
   /* User Profile Data State */
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+  const [image, setimage] = useState(null);
   const [profile, setProfile] = useState({
     dateOfBirth: "",
     email: "",
     phone: "",
-    image: "",
     skin: "",
     username: "",
+    gender: "",
   });
   const [myCountry, setMyCountry] = useState("");
   function InputChangeHandler(inputIdentifier, enteredValue) {
@@ -87,19 +92,48 @@ function MyProfile({ navigation }) {
   }
 
   useEffect(() => {
-    function getSession() {
+    async function getSession() {
+      const galleryStatus =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasGalleryPermission(galleryStatus.status === "granted");
+
       setProfile({
         dateOfBirth: myProfile.dateOfBirth,
         email: myProfile.email,
         phone: myProfile.phone,
-        image: myProfile.profileImage,
         skin: myProfile.skin,
         username: myProfile.username,
+        gender: myProfile.gender,
       });
       setMyCountry(myProfile.country);
+      // setimage(myProfile.image);
     }
     getSession();
   }, []);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    let formData = new FormData();
+    formData.append("file", {
+      uri: result.uri.replace("file:///", "file://"),
+      type: result.type,
+      name: result.uri.split("/").pop(),
+    });
+
+    if (!result.cancelled) {
+      setimage(result.uri);
+    }
+    await uploadFileFunction(formData);
+  };
+
+  if (hasGalleryPermission === false) {
+    return <Text>No access to internal storage</Text>;
+  }
 
   const nameRef = useRef();
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -111,10 +145,11 @@ function MyProfile({ navigation }) {
   const [isloading, setLoading] = useState(false);
 
   async function onSave() {
+    let imageFile = await uploadFileFunction(image);
     setLoading(true);
     let response = await updateUserProfileFunction(profile);
     response
-      ? await getmyDetailsfunction(myProfile, true).then((_) =>
+      ? await getmyDetailsfunction(DataContext, true).then((_) =>
           setLoading(false)
         )
       : null;
@@ -217,13 +252,21 @@ function MyProfile({ navigation }) {
                 </Text>
                 {dataContext.userProfile.username}
               </Text>
-
-              <Image
-                // source={dataContext.userProfile.image}
-                source={require("../../assets/avatar.jpg")}
-                resizeMode="cover"
-                style={{ height: 100, width: 100, borderRadius: 60 }}
-              />
+              <TouchableOpacity
+                onPress={() => {
+                  pickImage();
+                  setIsEdit(true);
+                }}
+              >
+                <Image
+                  // source={{ uri: dataContext.userProfile.image }}
+                  source={
+                    image ? { uri: image } : require("../../assets/avatar.jpg")
+                  }
+                  resizeMode="cover"
+                  style={{ height: 100, width: 100, borderRadius: 60 }}
+                />
+              </TouchableOpacity>
             </View>
 
             {/* Details */}

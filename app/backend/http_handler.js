@@ -19,10 +19,15 @@ export async function httpRequest(method, url, data, authtoken) {
 
 export async function sendMultipart(url, data, authToken) {
   try {
-    await axios.post(url, data, {
-      headers: { token: authToken, "Content-Type": "multipart/form-data" },
-    });
+    await axios
+      .post(url, data, {
+        headers: { token: authToken, "Content-Type": "multipart/form-data" },
+      })
+      .then((v) => {
+        console.log(v);
+      });
   } catch (error) {
+    console.log(error);
     alert("Something went wrong!");
   }
 }

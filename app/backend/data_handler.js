@@ -1,4 +1,4 @@
-import { httpRequest } from "./http_handler";
+import { httpRequest, sendMultipart } from "./http_handler";
 import api_handlers, { getRoutineAPI, postRoutineAPI } from "./api_handlers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -152,16 +152,17 @@ export async function getmyDetailsfunction(userData, saveProfile) {
   let response = await httpRequest("GET", api_handlers.getmyDetails, {}, token);
   let user = saveProfile
     ? {
-      userId: response.user._id,
-      country: response.user.country,
-      dateOfBirth: response.user.dateOfBirth,
-      email: response.user.email,
-      phone: response.user.phone,
-      image: response.user.profileImage,
-      skin: response.user.skinCondition,
-      username: response.user.username,
-      authToken: token,
-    }
+        userId: response.user._id,
+        gender: response.user.gender,
+        country: response.user.country,
+        dateOfBirth: response.user.dateOfBirth,
+        email: response.user.email,
+        phone: response.user.phone,
+        image: response.user.profileImage,
+        skin: response.user.skinCondition,
+        username: response.user.username,
+        authToken: token,
+      }
     : null;
   saveProfile ? userData.addUserProfile(user) : null;
   return response;
@@ -192,20 +193,34 @@ export async function updateRoutinefunction(routineData, routineId) {
 export async function getGraphDataFunction(duration, type, context) {
   let token = await AsyncStorage.getItem("authToken");
   try {
-    let graph = {};
-    let response = await httpRequest("GET", api_handlers.getGraphDetailAPI + `?setdate=${duration}&type=${type}`, {}, token);
+    let graph = [];
+    let response = await httpRequest(
+      "GET",
+      api_handlers.getGraphDetailAPI + `?setdate=${duration}&type=${type}`,
+      {},
+      token
+    );
     for (const dayGraph of response.routine) {
       let data = {
-        "day": dayGraph.createdAt,
-        "value": dayGraph.count
-      }
-      graph = { ...graph, data }
+        day: dayGraph.createdAt,
+        value: dayGraph.count,
+      };
+      graph.push(data);
     }
-
+    console.log(JSON.stringify(graph));
     context.setRoutineGraph(graph);
-
   } catch (error) {
     alert("Something Went Wrong");
   }
+}
 
+export async function uploadFileFunction(data) {
+  let token = await AsyncStorage.getItem("authToken");
+  console.log(data);
+  try {
+    await sendMultipart(api_handlers.uploadFileAPI, data, token);
+  } catch (error) {
+    console.log(error);
+    alert("Unable to upload your image.");
+  }
 }

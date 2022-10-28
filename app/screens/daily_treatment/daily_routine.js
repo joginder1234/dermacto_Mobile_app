@@ -25,7 +25,6 @@ import { useEffect } from "react";
 import { useContext } from "react";
 import { DataContext } from "../../context/AppDataContext";
 import { CheckBox } from "react-native-btr";
-import { duration } from "moment";
 
 function DailyRoutine({ navigation }) {
   const routineDataCtx = useContext(DataContext);

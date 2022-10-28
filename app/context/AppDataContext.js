@@ -57,6 +57,10 @@ export const DataContext = createContext({
   //Category context
   Category: [],
   addCategory: (categories) => {},
+
+  //set Routine Graph context
+  routineGraph: [],
+  setRoutineGraph: (graphData) => {},
 });
 
 function ManualProductReducer(state, action) {
@@ -83,6 +87,7 @@ function DataContextProvider({ children }) {
   const [routineDayvalue, setRoutineDayValue] = useState("");
   const [sortTypevalue, setSortTypeValue] = useState("");
   const [categoryValue, setCategoryValue] = useState([]);
+  const [graphValue, setGraphValue] = useState([]);
 
   function addUserProfile(userData) {
     setuserProfile(userData);
@@ -162,6 +167,11 @@ function DataContextProvider({ children }) {
     setCategoryValue((currentValue) => [currentValue, categories]);
   }
 
+  //set routine graph function
+  function setRoutineGraph(graphData) {
+    setGraphValue(graphData);
+  }
+
   const value = {
     userProfile: userprofile,
     addUserProfile: addUserProfile,
@@ -202,6 +212,10 @@ function DataContextProvider({ children }) {
     //sort type context
     SortType: sortTypevalue,
     setSortType: setSortType,
+
+    //set graph data context
+    routineGraph: graphValue,
+    setRoutineGraph: setRoutineGraph,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
