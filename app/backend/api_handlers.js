@@ -14,4 +14,5 @@ module.exports = {
   getmyDetails: base_url + "/user/detail/me",
   getRoutineAPI: base_url + "/routine/list",
   updateRoutineAPI: base_url + "/routine/edit/",
+  getGraphDetailAPI: base_url + "routine/graph",
 };

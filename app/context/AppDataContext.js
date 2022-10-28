@@ -3,52 +3,56 @@ import { createContext, useReducer, useState } from "react";
 export const DataContext = createContext({
   /** User profile Handler */
   userProfile: {},
-  addUserProfile: (userData) => {},
+  addUserProfile: (userData) => { },
 
   /** Products Handler */
   productsList: [],
-  setProductsValue: (products) => {},
+  setProductsValue: (products) => { },
 
   /* Add Topicals context */
   tropicals: [],
-  addProduct: (value) => {},
-  removeProduct: (value) => {},
+  addProduct: (value) => { },
+  removeProduct: (value) => { },
 
   // selected product handler
   product: {},
-  addProductEntry: (entry) => {},
-  removeProductEntry: (entry) => {},
+  addProductEntry: (entry) => { },
+  removeProductEntry: (entry) => { },
 
   //Days Of Week handdler
   Days: [],
-  addDays: (day) => {},
-  setEmptyDaysList: () => {},
-  removeDay: (day) => {},
+  addDays: (day) => { },
+  setEmptyDaysList: () => { },
+  removeDay: (day) => { },
 
   // selected product category refinary
   selectedProductType: "",
-  setProductTypeValue: (type) => {},
+  setProductTypeValue: (type) => { },
 
   //Add Product Manually Context
   ManualProduct: [],
-  addManualProduct: ({ CompanyName, ProductName, ProductCategory }) => {},
-  setManualProduct: (productData) => {},
+  addManualProduct: ({ CompanyName, ProductName, ProductCategory }) => { },
+  setManualProduct: (productData) => { },
 
   // Register with context
   RegisterData: {},
-  addRegisterData: (data) => {},
+  addRegisterData: (data) => { },
 
   // getVerificationId
   verificationId: null,
-  setverificationId: () => {},
+  setverificationId: () => { },
 
   //routine Data context
   routineData: {},
-  addRoutineData: (routineedata) => {},
+  addRoutineData: (routineedata) => { },
 
   //get routine day context
   routineDay: "",
-  setroutineDay: (day) => {},
+  setroutineDay: (day) => { },
+
+  // daily routine graph context
+  routineGraph: {},
+  setRoutineGraph: (data) => { }
 });
 
 function ManualProductReducer(state, action) {
@@ -73,6 +77,7 @@ function DataContextProvider({ children }) {
   const [verificationId, setVerificationId] = useState(null);
   const [routinedataValue, setRoutineDataValue] = useState({});
   const [routineDayvalue, setRoutineDayValue] = useState("");
+  const [graphData, setGraphData] = useState({});
 
   function addUserProfile(userData) {
     setuserProfile(userData);
@@ -142,6 +147,12 @@ function DataContextProvider({ children }) {
     setRoutineDayValue(day);
   }
 
+
+  // routineGraphFunction
+  function setRoutineGraphData(data) {
+    setGraphData(data);
+  }
+
   const value = {
     userProfile: userprofile,
     addUserProfile: addUserProfile,
@@ -178,6 +189,10 @@ function DataContextProvider({ children }) {
     //get routine day function
     routineDay: routineDayvalue,
     setroutineDay: setroutineDay,
+
+    // getter and setter for graph data
+    routineGraph: graphData,
+    setRoutineGraph: setGraphData,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
