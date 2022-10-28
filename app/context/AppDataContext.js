@@ -53,6 +53,10 @@ export const DataContext = createContext({
   //Product sorting context
   SortType: "",
   setSortType: (type) => {},
+
+  //Category context
+  Category: [],
+  addCategory: (categories) => {},
 });
 
 function ManualProductReducer(state, action) {
@@ -78,6 +82,7 @@ function DataContextProvider({ children }) {
   const [routinedataValue, setRoutineDataValue] = useState({});
   const [routineDayvalue, setRoutineDayValue] = useState("");
   const [sortTypevalue, setSortTypeValue] = useState("");
+  const [categoryValue, setCategoryValue] = useState([]);
 
   function addUserProfile(userData) {
     setuserProfile(userData);
@@ -150,6 +155,11 @@ function DataContextProvider({ children }) {
   //sort type function
   function setSortType(type) {
     setSortTypeValue(type);
+  }
+
+  //Category function
+  function addCategory(categories) {
+    setCategoryValue((currentValue) => [currentValue, categories]);
   }
 
   const value = {
