@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import { RadioButton } from "react-native-paper";
+import { DataContext } from "../../../context/AppDataContext";
 
 function ProductSortBottomSheet(props) {
-  const [checked, setChecked] = React.useState("first");
+  const sortCtx = useContext(DataContext);
+  const [checked, setChecked] = React.useState("Newest First");
   return (
     <View style={styles.bottomSheetContainer}>
       {/*Bottom Sheet Appbar*/}
@@ -19,7 +21,11 @@ function ProductSortBottomSheet(props) {
             Sort
           </Text>
 
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity
+            onPress={() => {
+              sortCtx.setSortType(checked);
+            }}
+          >
             <Text
               style={{
                 fontSize: 16,
@@ -52,9 +58,11 @@ function ProductSortBottomSheet(props) {
         }}
       >
         <RadioButton
-          value="first"
-          status={checked === "first" ? "checked" : "unchecked"}
-          onPress={() => setChecked("first")}
+          value="Newest First"
+          status={checked === "Newest First" ? "checked" : "unchecked"}
+          onPress={() => {
+            setChecked("Newest First");
+          }}
         />
         <View style={{ width: 20 }} />
         <Text>Newest First</Text>
@@ -70,9 +78,11 @@ function ProductSortBottomSheet(props) {
         }}
       >
         <RadioButton
-          value="second"
-          status={checked === "second" ? "checked" : "unchecked"}
-          onPress={() => setChecked("second")}
+          value="Oldest First"
+          status={checked === "Oldest First" ? "checked" : "unchecked"}
+          onPress={() => {
+            setChecked("Oldest First");
+          }}
         />
         <View style={{ width: 20 }} />
         <Text>Oldest First</Text>
@@ -88,9 +98,11 @@ function ProductSortBottomSheet(props) {
         }}
       >
         <RadioButton
-          value="third"
-          status={checked === "third" ? "checked" : "unchecked"}
-          onPress={() => setChecked("third")}
+          value="Product Name A-Z"
+          status={checked === "Product Name A-Z" ? "checked" : "unchecked"}
+          onPress={() => {
+            setChecked("Product Name A-Z");
+          }}
         />
         <View style={{ width: 20 }} />
         <Text>Product Name A-Z</Text>
@@ -106,9 +118,11 @@ function ProductSortBottomSheet(props) {
         }}
       >
         <RadioButton
-          value="fourth"
-          status={checked === "fourth" ? "checked" : "unchecked"}
-          onPress={() => setChecked("fourth")}
+          value="Product Name Z-A"
+          status={checked === "Product Name Z-A" ? "checked" : "unchecked"}
+          onPress={() => {
+            setChecked("Product Name Z-A");
+          }}
         />
         <View style={{ width: 20 }} />
         <Text>Product Name Z-A</Text>
@@ -124,9 +138,11 @@ function ProductSortBottomSheet(props) {
         }}
       >
         <RadioButton
-          value="fifth"
-          status={checked === "fifth" ? "checked" : "unchecked"}
-          onPress={() => setChecked("fifth")}
+          value="Brand Name A-Z"
+          status={checked === "Brand Name A-Z" ? "checked" : "unchecked"}
+          onPress={() => {
+            setChecked("Brand Name A-Z");
+          }}
         />
         <View style={{ width: 20 }} />
         <Text>Brand Name A-Z</Text>
@@ -142,9 +158,11 @@ function ProductSortBottomSheet(props) {
         }}
       >
         <RadioButton
-          value="sixth"
-          status={checked === "sixth" ? "checked" : "unchecked"}
-          onPress={() => setChecked("sixth")}
+          value="Brand Name Z-A"
+          status={checked === "Brand Name Z-A" ? "checked" : "unchecked"}
+          onPress={() => {
+            setChecked("Brand Name Z-A");
+          }}
         />
         <View style={{ width: 20 }} />
         <Text>Brand Name Z-A</Text>

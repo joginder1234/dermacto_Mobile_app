@@ -49,6 +49,10 @@ export const DataContext = createContext({
   //get routine day context
   routineDay: "",
   setroutineDay: (day) => {},
+
+  //Product sorting context
+  SortType: "",
+  setSortType: (type) => {},
 });
 
 function ManualProductReducer(state, action) {
@@ -73,6 +77,7 @@ function DataContextProvider({ children }) {
   const [verificationId, setVerificationId] = useState(null);
   const [routinedataValue, setRoutineDataValue] = useState({});
   const [routineDayvalue, setRoutineDayValue] = useState("");
+  const [sortTypevalue, setSortTypeValue] = useState("");
 
   function addUserProfile(userData) {
     setuserProfile(userData);
@@ -142,6 +147,11 @@ function DataContextProvider({ children }) {
     setRoutineDayValue(day);
   }
 
+  //sort type function
+  function setSortType(type) {
+    setSortTypeValue(type);
+  }
+
   const value = {
     userProfile: userprofile,
     addUserProfile: addUserProfile,
@@ -178,6 +188,10 @@ function DataContextProvider({ children }) {
     //get routine day function
     routineDay: routineDayvalue,
     setroutineDay: setroutineDay,
+
+    //sort type context
+    SortType: sortTypevalue,
+    setSortType: setSortType,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -33,7 +33,7 @@ function AddProduct({ navigation, route }) {
   /* Screen states */
   const [isloading, setLoading] = useState(false);
   let [dialogVisible, setDialogVisible] = useState(false);
-  const [sortBy, setSort] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const [treatment, addTreatment] = useState({});
   const [isVisible, setIsVisible] = useState(false);
   const [catBottomsheet, SetCatBottomSheet] = useState(false);
@@ -45,47 +45,80 @@ function AddProduct({ navigation, route }) {
       setLoading(true);
       let token = await AsyncStorage.getItem("authToken");
       await getProducts(token, AppData);
-
       setLoading(false);
+      AppData.setSortType("Newest First");
     }
     getProductsList();
   }, []);
 
   /* Product Sorting Handler */
-  const sortItems = (item)=> {
-    switch (sortBy) {
-      case "Oldest First": return item.sort((a,b)=> new Date(a.createdAt).getTime()- new Date(b.createdAt).getTime()).reverse();
-      case "Product Name A-Z": return item.sort((a,b)=> a.productName.localeCompare(b.productName));
-        case "Product Name Z-A": return item.sort((a,b)=> a.productName.localeCompare(b.productName)).reverse();
-        case "Brand Name A-Z": return item.sort((a,b)=> a.companyName.localeCompare(b.companyName));
-      case "Brand Name Z-A": return item.sort((a,b)=> a.companyName.localeCompare(b.companyName)).reverse();
-      default: return item.sort((a,b)=> new Date(a.createdAt).getTime()- new Date(b.createdAt).getTime());
+  const sortItems = (item) => {
+    switch (AppData.SortType) {
+      case "Oldest First":
+        return item.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      case "Product Name A-Z":
+        return item.sort((a, b) => a.productName.localeCompare(b.productName));
+      case "Product Name Z-A":
+        return item
+          .sort((a, b) => a.productName.localeCompare(b.productName))
+          .reverse();
+      case "Brand Name A-Z":
+        return item.sort((a, b) => a.companyName.localeCompare(b.companyName));
+      case "Brand Name Z-A":
+        return item
+          .sort((a, b) => a.companyName.localeCompare(b.companyName))
+          .reverse();
+      default:
+        return item
+          .sort(
+            (a, b) =>
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          )
+          .reverse();
     }
-  }
+  };
 
   /* Organized List of Tropical Items */
-  const getTropicalProducts=()=> {
+  const getTropicalProducts = () => {
     let productItems = AppData.productsList.filter(
-      (item) => item.productType === "Tropical" 
+      (item) => item.productType === "Tropical"
     );
-    return sortItems(productItems);
-  }
+    let sortedItems = sortItems(productItems);
+    return sortedItems.filter((v) =>
+      (v.companyName || v.productName)
+        .toLowerCase()
+        .includes(searchValue.toLowerCase())
+    );
+  };
 
-    /* Organized List of Oral Items */
-  const getOralProducts=()=> {
+  /* Organized List of Oral Items */
+  const getOralProducts = () => {
     let productItems = AppData.productsList.filter(
-      (item) => item.productType === "Oral" 
+      (item) => item.productType === "Oral"
     );
-    return sortItems(productItems);
-  }
+    let sortedItems = sortItems(productItems);
+    return sortedItems.filter((v) =>
+      (v.companyName || v.productName)
+        .toLowerCase()
+        .includes(searchValue.toLowerCase())
+    );
+  };
 
   /* Organized List of Other Items */
-  const getOtherProducts=()=> {
+  const getOtherProducts = () => {
     let productItems = AppData.productsList.filter(
-      (item) => item.productType === "Others" 
+      (item) => item.productType === "Others"
     );
-    return sortItems(productItems);
-  }
+    let sortedItems = sortItems(productItems);
+    return sortedItems.filter((v) =>
+      (v.companyName || v.productName)
+        .toLowerCase()
+        .includes(searchValue.toLowerCase())
+    );
+  };
 
   /* Product Filter by the treatment category */
   const productList = () => {
@@ -98,8 +131,6 @@ function AddProduct({ navigation, route }) {
         return getOtherProducts();
     }
   };
-
-  
 
   function closeBottomSheet() {
     if (isSchedule == true) {
@@ -189,13 +220,17 @@ function AddProduct({ navigation, route }) {
           <TextInput
             placeholder="Search products by product name or brand..."
             style={styles.textinput}
+            onChangeText={(value) => {
+              console.log(value);
+              setSearchValue(value);
+            }}
           />
           {/* Buttons */}
           <View style={{ width: "100%", flexDirection: "row" }}>
             {/* Button Sort */}
             <TouchableOpacity onPress={toggleBottomNavigationView}>
               <View style={styles.button}>
-                <Text>Sort : Newest First</Text>
+                <Text>Sort : {AppData.SortType}</Text>
               </View>
             </TouchableOpacity>
 
