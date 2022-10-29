@@ -224,3 +224,36 @@ export async function uploadFileFunction(data) {
     alert("Unable to upload your image.");
   }
 }
+
+export async function uploadScheduleFunction(data, AppData) {
+  let token = await AsyncStorage.getItem("authToken");
+  try {
+    await httpRequest("POST", api_handlers.uploadScheduleAPI, data, token).then(
+      (v) => {
+        console.log(v);
+        let days = [];
+        for (const day of v.schedule.SelectedDays) {
+          let data = {
+            dayId: day._id,
+            isSelected: day.selected,
+            isMedicineTaken: day.medicineTaken,
+            day: day.day,
+          };
+          days.push(data);
+          console.log(`per day data :: ${data} `);
+        }
+        let scheduleData = {
+          scheduleId: v.schedule._id,
+          productId: v.schedule.productId,
+          schedule: v.schedule.schedule,
+          selectedDays: days,
+          isEverday: days.every((value) => value.isSelected === true),
+        };
+        AppData.setScheduleData([...AppData.Scheduledata, scheduleData]);
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    alert("Something Went Wrong");
+  }
+}

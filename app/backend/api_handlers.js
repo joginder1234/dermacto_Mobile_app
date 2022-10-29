@@ -16,4 +16,5 @@ module.exports = {
   updateRoutineAPI: base_url + "/routine/edit/",
   getGraphDetailAPI: base_url + "/routine/graph",
   uploadFileAPI: base_url + "/upload?folder=users",
+  uploadScheduleAPI: base_url + "/add/schedule",
 };

@@ -16,6 +16,7 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../../../config/colors";
 import { DataContext } from "../../../context/AppDataContext";
+import { useEffect } from "react";
 
 function MedicationTile({ navigation, route }) {
   const AppData = useContext(DataContext);
@@ -43,6 +44,14 @@ function MedicationTile({ navigation, route }) {
         );
     }
   };
+
+  useEffect(() => {
+    const getAddedProducttropical = () => {
+      let dayData = AppData.Scheduledata;
+      console.log(dayData);
+    };
+    getAddedProducttropical();
+  }, []);
 
   const getImage = () => {
     if (route.params.count == 1) {
@@ -113,7 +122,7 @@ function MedicationTile({ navigation, route }) {
             </Text>
           </View>
           {/* Edit Button */}
-          {getAddedProduct().length >= 1 && (
+          {AppData.Scheduledata.length >= 1 && (
             <Pressable
               style={{
                 borderWidth: 1,
@@ -160,14 +169,21 @@ function MedicationTile({ navigation, route }) {
             }}
           />
         </TouchableOpacity>
-        {getAddedProduct().length < 1 ? (
+        {AppData.Scheduledata.length < 1 ? (
           noElemntView()
         ) : (
           <FlatList
-            data={getAddedProduct()}
-            keyExtractor={(item) => item.product.productId}
+            data={AppData.Scheduledata}
+            keyExtractor={(item) => item.scheduleId}
             renderItem={(itemData) => (
               <View style={styles.routineTile}>
+                {console.log(
+                  `itemData.item :: ${
+                    AppData.productsList.find(
+                      (data) => data.productId === itemData.item.productId
+                    ).productImage
+                  }`
+                )}
                 <View
                   style={{
                     width: 30,
@@ -179,8 +195,16 @@ function MedicationTile({ navigation, route }) {
                   }}
                 >
                   <Image
-                    source={itemData.item.product.productImage}
-                    style={{ width: 18, height: 18, tintColor: "white" }}
+                    source={{
+                      uri: AppData.productsList.find(
+                        (data) => data.productId === itemData.item.productId
+                      ).productImage,
+                    }}
+                    resizeMode="cover"
+                    style={{
+                      width: 30,
+                      height: 30,
+                    }}
                   />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -188,7 +212,11 @@ function MedicationTile({ navigation, route }) {
                     style={{ marginLeft: 5, fontSize: 15, fontWeight: "500" }}
                     numberOfLines={1}
                   >
-                    {itemData.item.product.productName}
+                    {
+                      AppData.productsList.find(
+                        (data) => data.productId === itemData.item.productId
+                      ).productName
+                    }
                   </Text>
                 </View>
 
@@ -222,7 +250,7 @@ function MedicationTile({ navigation, route }) {
                       marginLeft: 30,
                     }}
                   >
-                    {itemData.item.timing == "Both" ? (
+                    {itemData.item.schedule == "both" ? (
                       <View
                         style={{
                           flexDirection: "row",
@@ -242,9 +270,9 @@ function MedicationTile({ navigation, route }) {
                     ) : (
                       <Image
                         source={
-                          itemData.item.timing == "Morning"
+                          itemData.item.schedule == "morning"
                             ? require("../../../assets/sun.png")
-                            : itemData.item.timing == "Night" &&
+                            : itemData.item.schedule == "night" &&
                               require("../../../assets/moon.png")
                         }
                         style={{ width: 20, height: 20 }}
@@ -257,37 +285,50 @@ function MedicationTile({ navigation, route }) {
                         marginTop: 5,
                         alignItems: "center",
                         justifyContent: "center",
-                        borderWidth: 1,
-                        borderColor: colors.chocoColor,
                       }}
                     >
-                      <FlatList
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        data={itemData.item.Days}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                          <View
-                            style={{
-                              paddingHorizontal: 5,
-                              paddingVertical: 1,
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <Text
+                      {itemData.item.isEverday === true ? (
+                        <Text
+                          style={{
+                            color: colors.primaryColor,
+                            fontWeight: "500",
+                            alignSelf: "center",
+                            textAlign: "center",
+                          }}
+                        >
+                          Everyday
+                        </Text>
+                      ) : (
+                        <FlatList
+                          horizontal={true}
+                          showsHorizontalScrollIndicator={false}
+                          data={itemData.item.selectedDays.filter(
+                            (v) => v.isSelected === true
+                          )}
+                          keyExtractor={(item) => item.dayId}
+                          renderItem={({ item }) => (
+                            <View
                               style={{
-                                color: colors.primaryColor,
-                                fontWeight: "500",
-                                alignSelf: "center",
-                                textAlign: "center",
+                                paddingHorizontal: 5,
+                                paddingVertical: 1,
+                                alignItems: "center",
+                                justifyContent: "center",
                               }}
                             >
-                              {item}
-                            </Text>
-                          </View>
-                        )}
-                      />
+                              <Text
+                                style={{
+                                  color: colors.primaryColor,
+                                  fontWeight: "500",
+                                  alignSelf: "center",
+                                  textAlign: "center",
+                                }}
+                              >
+                                {item.day[0] + item.day[1]}
+                              </Text>
+                            </View>
+                          )}
+                        />
+                      )}
                     </View>
                   </View>
                 )}

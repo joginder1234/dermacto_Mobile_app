@@ -38,6 +38,7 @@ function AddProduct({ navigation, route }) {
   const [isVisible, setIsVisible] = useState(false);
   const [catBottomsheet, SetCatBottomSheet] = useState(false);
   const [isSchedule, setSchedule] = useState(false);
+  const [selectedProduct, setProductSelection] = useState("");
 
   /* Initial State to fatch Product from database  */
   useEffect(() => {
@@ -260,6 +261,7 @@ function AddProduct({ navigation, route }) {
                   }}
                   onPress={() => {
                     ProductAddedStatusHandler({ product: item });
+                    setProductSelection(item.productId);
                     toggleScheduleBottomView();
                   }}
                 >
@@ -327,6 +329,7 @@ function AddProduct({ navigation, route }) {
           routes={route.params.route === "tropical"}
           navigation={navigation}
           callback={closeBottomSheet}
+          productId={selectedProduct}
         />
         {isloading ? <CustomeLoaderState /> : null}
       </View>

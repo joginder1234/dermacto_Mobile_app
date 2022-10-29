@@ -6,12 +6,15 @@ const {
   Pressable,
   Dimensions,
   FlatList,
+  ActivityIndicator,
 } = require("react-native");
 const { BottomSheet, CheckBox } = require("react-native-btr");
 import Dialog from "react-native-dialog";
 import ScheduleSelector2 from "../products/ScheduleSelector2";
 import { useContext, useState } from "react";
 import { DataContext } from "../../context/AppDataContext";
+import { uploadScheduleFunction } from "../../backend/data_handler";
+import CustomeLoaderState from "./custome_loader";
 
 // import Dialog, {
 //   DialogButton,
@@ -26,67 +29,93 @@ function CustomBottomSheet({
   routes,
   navigation,
   callback,
+  productId,
 }) {
   const AppData = useContext(DataContext);
 
   let [dialogVisible, setDialogVisible] = useState(false);
 
   let [CheckboxActive, SetCheckBoxActive] = useState({
-    1: false,
+    1: true,
     2: false,
   });
   let [selectedTime, SelectTime] = useState("");
   let [buttonPressed, setButtonPressed] = useState(0);
   let [selectedItem, SelectItem] = useState(null);
+  let [isloading, setLoading] = useState(false);
 
   const dayIsSelected = AppData.Days.includes();
 
-  function ProductAddedStatusHandler(item) {
-    setDialogVisible(true);
+  // function ProductAddedStatusHandler(item) {
+  //   setDialogVisible(true);
 
-    AppData.addProductEntry({
-      ...AppData.product,
-      Days: AppData.Days,
-      timing: item,
-    });
-  }
+  //   AppData.addProductEntry({
+  //     ...AppData.product,
+  //     Days: AppData.Days,
+  //     timing: item,
+  //   });
+  // }
 
   async function diployData() {
     AppData.addProduct([...AppData.tropicals, AppData.product]);
     setDialogVisible(false);
     navigation.goBack();
   }
-
-  const DaysOfWeek = [
+  const [DaysOfWeek, setWeekDayData] = useState([
     {
       id: 1,
       title: "Mo",
+      label: "Monday",
+      isActive: false,
     },
     {
       id: 2,
       title: "Tu",
+      label: "Tuesday",
+      isActive: false,
     },
     {
       id: 3,
       title: "We",
+      label: "Wednesday",
+      isActive: false,
     },
     {
       id: 4,
       title: "Th",
+      label: "Thursday",
+      isActive: false,
     },
     {
       id: 5,
       title: "Fr",
+      label: "Friday",
+      isActive: false,
     },
     {
       id: 6,
       title: "Sa",
+      label: "Saturday",
+      isActive: false,
     },
     {
       id: 7,
       title: "Su",
+      label: "Sunday",
+      isActive: false,
     },
-  ];
+  ]);
+
+  function daySelectionHandler(item) {
+    let newDayData = [...DaysOfWeek];
+    newDayData[DaysOfWeek.indexOf(item)] = {
+      id: item.id,
+      title: item.title,
+      label: item.label,
+      isActive: !item.isActive,
+    };
+    setWeekDayData(newDayData);
+  }
 
   function onPressHandler(check) {
     if (check == "everyday") {
@@ -99,69 +128,28 @@ function CustomBottomSheet({
     }
   }
 
-  // const productList = () => {
-  //   switch (AppData.selectedProductType) {
-  //     case "Tropicals":
-  //       return AppData.productsList.filter(
-  //         (item) => item.productType === "Tropical"
-  //       )
-  //     case "Oral":
-  //       return AppData.productsList.filter(
-  //         (item) => item.productType === "Oral"
-  //       );
-
-  //     default:
-  //       return AppData.productsList.filter(
-  //         (item) => item.productType === "Others"
-  //       );
-  //   }
-  // };
-  // function timingHandler() {
-  //   if (BothbuttonPressed == true) {
-  //     setMorButtonPressed(false);
-  //     setNiButtonPressed(false);
-  //   } else if (NibuttonPressed == true) {
-  //     setMorButtonPressed(false);
-  //     setBothButtonPressed(false);
-  //   } else if (MorbuttonPressed == true) {
-  //     setBothButtonPressed(false);
-  //     setNiButtonPressed(false);
-  //   } else null;
-  // }
+  async function onScheduleSubmit() {
+    setLoading(true);
+    let scheduleArray = DaysOfWeek.map((day) => {
+      return {
+        day: day.label,
+        selected: CheckboxActive[1] == true ? true : day.isActive,
+        medicineTaken: false,
+      };
+    });
+    let schedule = {
+      productId: productId,
+      userId: AppData.userProfile.userId,
+      schedule: selectedTime.toLowerCase(),
+      SelectedDays: scheduleArray,
+    };
+    await uploadScheduleFunction(schedule, AppData).then((v) => {
+      setLoading(false);
+    });
+  }
 
   return (
     <>
-      {/* <Dialog
-        visible={dialogVisible}
-        onDismiss={() => {
-          setDialogVisible(false);
-        }}
-        onTouchOutside={() => setDialogVisible(false)}
-        dialogTitle={<DialogTitle title="Alert!" />}
-        footer={
-          <DialogFooter>
-            <DialogButton
-              text="CANCEL"
-              bordered
-              onPress={() => {
-                setDialogVisible(false);
-              }}
-              key="button-1"
-            />
-            <DialogButton
-              text="OK"
-              bordered
-              onPress={diployData}
-              key="button-2"
-            />
-          </DialogFooter>
-        }
-      >
-        <DialogContent>
-          <Text>Your selected schedule will be saved by pressing okay</Text>
-        </DialogContent>
-      </Dialog> */}
-
       <Dialog.Container visible={dialogVisible}>
         <Dialog.Title>Alert!</Dialog.Title>
         <Dialog.Description>
@@ -368,16 +356,13 @@ function CustomBottomSheet({
                     renderItem={({ item }) => (
                       <Pressable
                         onPress={() => {
-                          AppData.Days.includes(item.title)
-                            ? AppData.removeDay(item.title)
-                            : AppData.addDays(item.title);
+                          daySelectionHandler(item);
                         }}
                       >
                         <View
                           style={[
                             styles.DaysOfWeekContainer,
-                            AppData.Days.includes(item.title) &&
-                              styles.DaysOfWeekContainerSelected,
+                            item.isActive && styles.DaysOfWeekContainerSelected,
                           ]}
                         >
                           <Text
@@ -404,8 +389,8 @@ function CustomBottomSheet({
           <Pressable
             android_ripple={{ color: "#eee" }}
             onPress={() => {
+              onScheduleSubmit();
               callback();
-              ProductAddedStatusHandler(selectedTime);
             }}
             style={[
               styles.buttonStyle,
@@ -413,11 +398,16 @@ function CustomBottomSheet({
             ]}
           >
             <View>
-              <Text style={{ fontSize: 15, fontWeight: "500" }}>Save</Text>
+              {isloading ? (
+                <ActivityIndicator size={"large"} />
+              ) : (
+                <Text style={{ fontSize: 15, fontWeight: "500" }}>Save</Text>
+              )}
             </View>
           </Pressable>
         </View>
       </BottomSheet>
+      {/* {isloading ? <CustomeLoaderState /> : null} */}
     </>
   );
 }

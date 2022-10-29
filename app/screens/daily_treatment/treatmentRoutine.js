@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { getProducts } from "../../backend/data_handler";
+import colors from "../../config/colors";
 import { DataContext } from "../../context/AppDataContext";
 
 function TreatmentRoutine({ navigation }) {
@@ -65,7 +66,7 @@ function TreatmentRoutine({ navigation }) {
       {/* Body Items*/}
       <ScrollView style={styles.scrollViewStyle}>
         {/* Topicals tile*/}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => {
             dataContext.setProductTypeValue("Tropicals");
             getProductsList();
@@ -83,7 +84,56 @@ function TreatmentRoutine({ navigation }) {
             />
             <Text style={styles.text}>Topicals (External Application)</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+
+        <View style={styles.Q_tileStyle}>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "green" }}>
+              Topicals
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "500",
+                color: "green",
+                borderBottomWidth: 2,
+                borderBottomColor: "green",
+              }}
+            >
+              Select all
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "500",
+                color: "green",
+                borderBottomWidth: 2,
+                borderBottomColor: "green",
+              }}
+            >
+              Edit
+            </Text>
+          </View>
+          <View
+            style={{ flexDirection: "row", marginTop: 25, marginBottom: 15 }}
+          >
+            <View style={{ flex: 1 }} />
+            <Image
+              source={require("../../assets/sun.png")}
+              style={{ width: 20, height: 20, marginHorizontal: 5 }}
+            />
+            <Image
+              source={require("../../assets/moon.png")}
+              style={{ width: 20, height: 20, marginLeft: 10 }}
+            />
+          </View>
+        </View>
 
         {/*Oral Supplements tile*/}
         <TouchableOpacity

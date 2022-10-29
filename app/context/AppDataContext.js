@@ -61,6 +61,10 @@ export const DataContext = createContext({
   //set Routine Graph context
   routineGraph: [],
   setRoutineGraph: (graphData) => {},
+
+  //set Schedule context
+  Scheduledata: [],
+  setScheduleData: (schedule) => {},
 });
 
 function ManualProductReducer(state, action) {
@@ -88,6 +92,7 @@ function DataContextProvider({ children }) {
   const [sortTypevalue, setSortTypeValue] = useState("");
   const [categoryValue, setCategoryValue] = useState([]);
   const [graphValue, setGraphValue] = useState([]);
+  const [scheduleValue, setScheduleValue] = useState([]);
 
   function addUserProfile(userData) {
     setuserProfile(userData);
@@ -172,6 +177,11 @@ function DataContextProvider({ children }) {
     setGraphValue(graphData);
   }
 
+  // set Schedule function
+  function setScheduleData(schedule) {
+    setScheduleValue(schedule);
+  }
+
   const value = {
     userProfile: userprofile,
     addUserProfile: addUserProfile,
@@ -216,6 +226,10 @@ function DataContextProvider({ children }) {
     //set graph data context
     routineGraph: graphValue,
     setRoutineGraph: setRoutineGraph,
+
+    // set Schedule context
+    Scheduledata: scheduleValue,
+    setScheduleData: setScheduleData,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
