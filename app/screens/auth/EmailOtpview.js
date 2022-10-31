@@ -80,24 +80,24 @@ function EmailOtpView({ navigation, route }) {
   };
 
   const getProductsList = async (token) => {
-    var products = await getProducts(token, dataContext);
-    let productList = [];
-    for (let i = 0; i < products.product.length; i++) {
-      const aa = products.product[i];
-      let product = {
-        productId: aa._id,
-        companyName: aa.companyName,
-        isPublic: aa.isPublic,
-        productForm: aa.productForm,
-        productImage: aa.productImagePath,
-        productName: aa.productName,
-        productType: aa.productType,
-        userId: aa.userId,
-        createdAt: aa.createdAt,
-      };
-      productList.push(product);
-    }
-    dataContext.setProductsValue(productList);
+    await getProducts(token, dataContext);
+    // let productList = [];
+    // for (let i = 0; i < products.product.length; i++) {
+    //   const aa = products.product[i];
+    //   let product = {
+    //     productId: aa._id,
+    //     companyName: aa.companyName,
+    //     isPublic: aa.isPublic,
+    //     productForm: aa.productForm,
+    //     productImage: aa.productImagePath,
+    //     productName: aa.productName,
+    //     productType: aa.productType,
+    //     userId: aa.userId,
+    //     createdAt: aa.createdAt,
+    //   };
+    //   productList.push(product);
+    // }
+    // dataContext.setProductsValue(productList);
   };
 
   return (

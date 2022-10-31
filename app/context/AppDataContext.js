@@ -65,6 +65,9 @@ export const DataContext = createContext({
   //set Schedule context
   Scheduledata: [],
   setScheduleData: (schedule) => {},
+
+  isLoading: false,
+  setLoading: (status) => {},
 });
 
 function ManualProductReducer(state, action) {
@@ -93,6 +96,7 @@ function DataContextProvider({ children }) {
   const [categoryValue, setCategoryValue] = useState([]);
   const [graphValue, setGraphValue] = useState([]);
   const [scheduleValue, setScheduleValue] = useState([]);
+  const [isloading, setloading] = useState(false);
 
   function addUserProfile(userData) {
     setuserProfile(userData);
@@ -182,6 +186,10 @@ function DataContextProvider({ children }) {
     setScheduleValue(schedule);
   }
 
+  function setLoading(status) {
+    setloading(status);
+  }
+
   const value = {
     userProfile: userprofile,
     addUserProfile: addUserProfile,
@@ -230,6 +238,9 @@ function DataContextProvider({ children }) {
     // set Schedule context
     Scheduledata: scheduleValue,
     setScheduleData: setScheduleData,
+
+    isLoading: isloading,
+    setLoading: setLoading,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -170,9 +170,16 @@ function Analytics({ navigation, route }) {
   };
 
   return initvalue == true ? (
-    <View style={[styles.screenStyle, { alignItems: "center" }]}>
+    <View
+      style={[
+        styles.screenStyle,
+        {
+          alignItems: "center",
+        },
+      ]}
+    >
       <ActivityIndicator size="large" />
-      <Text style={{ marginTop: 15, fontSize: 18 }}>Loading Informations</Text>
+      <Text style={{ marginTop: 15, fontSize: 18 }}>Loading Insights Data</Text>
       <Text>Please Wait..</Text>
     </View>
   ) : (
@@ -365,6 +372,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#ededfc",
     padding: 15,
   },
+
+  screenStyle: {
+    justifyContent: "center",
+    alignItems: "stretch",
+    width: "100%",
+    height: "100%",
+  },
+
   buttonStyleInActive: {
     flexDirection: "row",
     borderRadius: 10,

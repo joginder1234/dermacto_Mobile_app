@@ -1,5 +1,9 @@
 import { httpRequest, sendMultipart } from "./http_handler";
-import api_handlers, { getRoutineAPI, postRoutineAPI } from "./api_handlers";
+import api_handlers, {
+  checkBoxFunctionAPI,
+  getRoutineAPI,
+  postRoutineAPI,
+} from "./api_handlers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const signupWithEmail = async (email) => {
@@ -229,31 +233,99 @@ export async function uploadScheduleFunction(data, AppData) {
   let token = await AsyncStorage.getItem("authToken");
   try {
     await httpRequest("POST", api_handlers.uploadScheduleAPI, data, token).then(
-      (v) => {
-        console.log(v);
-        let days = [];
-        for (const day of v.schedule.SelectedDays) {
-          let data = {
-            dayId: day._id,
-            isSelected: day.selected,
-            isMedicineTaken: day.medicineTaken,
-            day: day.day,
-          };
-          days.push(data);
-          console.log(`per day data :: ${data} `);
+      async (value) => {
+        await getScheduleFunction(AppData);
+      }
+    );
+  } catch (error) {
+    console.log(`schedule post errror ::  ${error}`);
+    alert("Something Went Wrong");
+  }
+}
+
+export async function getScheduleFunction(AppData) {
+  let token = await AsyncStorage.getItem("authToken");
+  try {
+    await httpRequest("GET", api_handlers.getScheduleAPI, {}, token).then(
+      (response) => {
+        if (response.schedule !== []) {
+          let finalList = [];
+          for (const values of response.schedule) {
+            let days = [];
+
+            for (const day of values.SelectedDays) {
+              let medicineSchedule = [];
+              for (const selection of day.medicineTaken) {
+                let pushData = {
+                  time: selection.time,
+                  active: selection.active,
+                  id: selection._id,
+                };
+                medicineSchedule.push(pushData);
+              }
+              let data = {
+                dayId: day._id,
+                isSelected: day.selected,
+                isMedicineTaken: medicineSchedule,
+                day: day.day,
+              };
+              days.push(data);
+            }
+            let scheduleData = {
+              productName: values.product.productName,
+              productType: values.type,
+              productImage: values.product.productImagePath,
+              scheduleId: values._id,
+              productId: values.productId,
+              schedule: values.schedule,
+              selectedDays: days,
+              isEverday: days.every((v) => v.isSelected === true),
+            };
+            finalList.push(scheduleData);
+          }
+          AppData.setScheduleData(finalList);
+        } else {
+          AppData.setScheduleData([]);
         }
-        let scheduleData = {
-          scheduleId: v.schedule._id,
-          productId: v.schedule.productId,
-          schedule: v.schedule.schedule,
-          selectedDays: days,
-          isEverday: days.every((value) => value.isSelected === true),
-        };
-        AppData.setScheduleData([...AppData.Scheduledata, scheduleData]);
+        console.log("This program is done");
       }
     );
   } catch (error) {
     console.log(error);
+    alert("Something went wrong!");
+  }
+}
+
+export async function removeScheduleFunction(scheduleId, AppData) {
+  let token = await AsyncStorage.getItem("authToken");
+  try {
+    await httpRequest(
+      "DELETE",
+      api_handlers.deleteScheduleAPI + scheduleId,
+      {},
+      token
+    ).then(async (v) => {
+      v.success == true ? alert(v.message) : null;
+      await getScheduleFunction(AppData);
+    });
+  } catch (error) {
+    alert("Something Went Wrong");
+  }
+}
+
+export async function markDoneFunction(data, scheduleId, AppData) {
+  let token = await AsyncStorage.getItem("authToken");
+  try {
+    await httpRequest(
+      "PUT",
+      api_handlers.checkBoxFunctionAPI + scheduleId,
+      data,
+      token
+    ).then(async (response) => {
+      await getScheduleFunction(AppData);
+      response.success == true ? alert(response.message) : null;
+    });
+  } catch (error) {
     alert("Something Went Wrong");
   }
 }

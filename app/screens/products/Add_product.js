@@ -124,7 +124,7 @@ function AddProduct({ navigation, route }) {
   /* Product Filter by the treatment category */
   const productList = () => {
     switch (AppData.selectedProductType) {
-      case "Tropicals":
+      case "Tropical":
         return getTropicalProducts();
       case "Oral":
         return getOralProducts();
@@ -137,6 +137,7 @@ function AddProduct({ navigation, route }) {
     if (isSchedule == true) {
       setSchedule(false);
     }
+    navigation.goBack();
   }
 
   const addobject = (data) => {

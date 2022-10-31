@@ -15,6 +15,7 @@ import { useContext, useState } from "react";
 import { DataContext } from "../../context/AppDataContext";
 import { uploadScheduleFunction } from "../../backend/data_handler";
 import CustomeLoaderState from "./custome_loader";
+import getRoutineArray from "../../helpers/appfunctions";
 
 // import Dialog, {
 //   DialogButton,
@@ -39,12 +40,9 @@ function CustomBottomSheet({
     1: true,
     2: false,
   });
-  let [selectedTime, SelectTime] = useState("");
+  let [selectedTime, SelectTime] = useState("Morning");
   let [buttonPressed, setButtonPressed] = useState(0);
-  let [selectedItem, SelectItem] = useState(null);
   let [isloading, setLoading] = useState(false);
-
-  const dayIsSelected = AppData.Days.includes();
 
   // function ProductAddedStatusHandler(item) {
   //   setDialogVisible(true);
@@ -130,19 +128,23 @@ function CustomBottomSheet({
 
   async function onScheduleSubmit() {
     setLoading(true);
+
     let scheduleArray = DaysOfWeek.map((day) => {
       return {
         day: day.label,
         selected: CheckboxActive[1] == true ? true : day.isActive,
-        medicineTaken: false,
+        medicineTaken: getRoutineArray(selectedTime),
       };
     });
+    console.log(AppData.selectedProductType);
     let schedule = {
       productId: productId,
-      userId: AppData.userProfile.userId,
+      type: AppData.selectedProductType,
       schedule: selectedTime.toLowerCase(),
       SelectedDays: scheduleArray,
     };
+    console.log("Prepared Schedule Schema");
+    console.log(schedule);
     await uploadScheduleFunction(schedule, AppData).then((v) => {
       setLoading(false);
     });
@@ -189,7 +191,7 @@ function CustomBottomSheet({
           />
 
           {/* Topicals Bottom Sheet */}
-          {AppData.selectedProductType == "Tropicals" ? (
+          {AppData.selectedProductType == "Tropical" ? (
             <View>
               <View
                 style={{
@@ -367,7 +369,7 @@ function CustomBottomSheet({
                         >
                           <Text
                             style={
-                              AppData.Days.includes(item.title) && {
+                              item.isActive && {
                                 color: "white",
                               }
                             }
@@ -381,30 +383,31 @@ function CustomBottomSheet({
                   />
                 </View>
               )}
+              <Pressable
+                android_ripple={{ color: "#eee" }}
+                onPress={() => {
+                  onScheduleSubmit();
+                  callback();
+                }}
+                style={[
+                  styles.buttonStyle,
+                  { alignSelf: "center", marginBottom: 40 },
+                ]}
+              >
+                <View>
+                  {isloading ? (
+                    <ActivityIndicator size={"large"} />
+                  ) : (
+                    <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                      Save
+                    </Text>
+                  )}
+                </View>
+              </Pressable>
             </View>
           ) : (
-            <ScheduleSelector2 isVisible={routes} />
+            <ScheduleSelector2 isVisible={routes} productId={productId} />
           )}
-
-          <Pressable
-            android_ripple={{ color: "#eee" }}
-            onPress={() => {
-              onScheduleSubmit();
-              callback();
-            }}
-            style={[
-              styles.buttonStyle,
-              { alignSelf: "center", marginBottom: 40 },
-            ]}
-          >
-            <View>
-              {isloading ? (
-                <ActivityIndicator size={"large"} />
-              ) : (
-                <Text style={{ fontSize: 15, fontWeight: "500" }}>Save</Text>
-              )}
-            </View>
-          </Pressable>
         </View>
       </BottomSheet>
       {/* {isloading ? <CustomeLoaderState /> : null} */}

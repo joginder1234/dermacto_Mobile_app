@@ -17,4 +17,7 @@ module.exports = {
   getGraphDetailAPI: base_url + "/routine/graph",
   uploadFileAPI: base_url + "/upload?folder=users",
   uploadScheduleAPI: base_url + "/add/schedule",
+  getScheduleAPI: base_url + "/list/schedule",
+  deleteScheduleAPI: base_url + "/delete/schedule/",
+  checkBoxFunctionAPI: base_url + "/edit/schedule/",
 };

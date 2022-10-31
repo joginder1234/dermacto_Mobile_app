@@ -17,41 +17,74 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../../../config/colors";
 import { DataContext } from "../../../context/AppDataContext";
 import { useEffect } from "react";
+import {
+  getScheduleFunction,
+  removeScheduleFunction,
+} from "../../../backend/data_handler";
 
 function MedicationTile({ navigation, route }) {
   const AppData = useContext(DataContext);
   const productlist = AppData.productsList;
 
   const [isEdit, setIsEdit] = useState(false);
+  const [isloading, setLoading] = useState(false);
   // function getAddedProduct() {
   //   return AppData.tropicals;
   // }
 
-  const getAddedProduct = () => {
+  // const getAddedProduct = () => {
+  //   switch (AppData.selectedProductType) {
+  //     case "Tropicals":
+  //       return AppData.tropicals.filter(
+  //         (item) => item.product.productType === "Tropical"
+  //       );
+  //     case "Oral":
+  //       return AppData.tropicals.filter(
+  //         (item) => item.product.productType === "Oral"
+  //       );
+
+  //     default:
+  //       return AppData.tropicals.filter(
+  //         (item) => item.product.productType === "Others"
+  //       );
+  //   }
+  // };
+  function getAddedProduct() {
     switch (AppData.selectedProductType) {
-      case "Tropicals":
-        return AppData.tropicals.filter(
-          (item) => item.product.productType === "Tropical"
+      case "Tropical":
+        return AppData.Scheduledata.filter(
+          (item) => item.productType == "Tropical"
         );
+
       case "Oral":
-        return AppData.tropicals.filter(
-          (item) => item.product.productType === "Oral"
+        return AppData.Scheduledata.filter(
+          (item) => item.productType == "Oral"
         );
 
       default:
-        return AppData.tropicals.filter(
-          (item) => item.product.productType === "Others"
+        return AppData.Scheduledata.filter(
+          (item) => item.productType == "Others"
         );
     }
-  };
+  }
 
   useEffect(() => {
-    const getAddedProducttropical = () => {
-      let dayData = AppData.Scheduledata;
-      console.log(dayData);
+    const getAddedProducttropical = async () => {
+      // let dayData = await getScheduleFunction(AppData);
+      AppData.Scheduledata;
+      // console.log(dayData);
     };
     getAddedProducttropical();
   }, []);
+
+  async function onRemoveSchedule(id) {
+    setLoading(true);
+    await removeScheduleFunction(id, AppData).then((_) => setLoading(false));
+  }
+
+  async function getAddedScheduleProducts() {
+    await getScheduleFunction(AppData);
+  }
 
   const getImage = () => {
     if (route.params.count == 1) {
@@ -122,7 +155,7 @@ function MedicationTile({ navigation, route }) {
             </Text>
           </View>
           {/* Edit Button */}
-          {AppData.Scheduledata.length >= 1 && (
+          {getAddedProduct().length >= 1 && (
             <Pressable
               style={{
                 borderWidth: 1,
@@ -169,41 +202,34 @@ function MedicationTile({ navigation, route }) {
             }}
           />
         </TouchableOpacity>
-        {AppData.Scheduledata.length < 1 ? (
+        {getAddedProduct().length < 1 ? (
           noElemntView()
         ) : (
           <FlatList
-            data={AppData.Scheduledata}
+            data={getAddedProduct()}
             keyExtractor={(item) => item.scheduleId}
             renderItem={(itemData) => (
               <View style={styles.routineTile}>
-                {console.log(
-                  `itemData.item :: ${
-                    AppData.productsList.find(
-                      (data) => data.productId === itemData.item.productId
-                    ).productImage
-                  }`
-                )}
+                {console.log(itemData.item)}
                 <View
                   style={{
-                    width: 30,
-                    height: 30,
+                    width: 40,
+                    height: 40,
                     backgroundColor: "green",
                     borderRadius: 50,
                     alignItems: "center",
                     justifyContent: "center",
+                    overflow: "hidden",
                   }}
                 >
                   <Image
                     source={{
-                      uri: AppData.productsList.find(
-                        (data) => data.productId === itemData.item.productId
-                      ).productImage,
+                      uri: itemData.item.productImage,
                     }}
                     resizeMode="cover"
                     style={{
-                      width: 30,
-                      height: 30,
+                      width: 40,
+                      height: 40,
                     }}
                   />
                 </View>
@@ -212,11 +238,7 @@ function MedicationTile({ navigation, route }) {
                     style={{ marginLeft: 5, fontSize: 15, fontWeight: "500" }}
                     numberOfLines={1}
                   >
-                    {
-                      AppData.productsList.find(
-                        (data) => data.productId === itemData.item.productId
-                      ).productName
-                    }
+                    {itemData.item.productName}
                   </Text>
                 </View>
 
@@ -237,6 +259,7 @@ function MedicationTile({ navigation, route }) {
                         borderWidth: 1,
                         padding: 5,
                       }}
+                      onPress={() => onRemoveSchedule(itemData.item.scheduleId)}
                       android_ripple={{ color: "#b2b2b2" }}
                     >
                       <Ionicons name="trash" size={20} />
@@ -375,7 +398,8 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "white",
     overflow: "hidden",
-    marginTop: 15,
+    marginTop: 6,
+    marginBottom: 6,
   },
 });
 
