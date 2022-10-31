@@ -61,8 +61,3 @@ export function getCheckList(item, time) {
     .filter((d1) => d1.day == getCurrentDay())[0]
     .isMedicineTaken.filter((v) => v.time == time);
 }
-
-export async function onChecked(data, id) {
-  setloading(true);
-  await markDoneFunction(data, id, dataContext).then((_) => setloading(false));
-}
